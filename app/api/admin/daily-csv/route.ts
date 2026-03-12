@@ -26,7 +26,7 @@ export async function GET(request: NextRequest) {
 
   const { data: orders } = await supabase
     .from("orders")
-    .select("*, profiles(full_name, email), menu_items(name, restaurants(name))")
+    .select("*, profiles!orders_user_id_fkey(full_name, email), menu_items(name, restaurants(name))")
     .eq("order_date", date)
     .neq("status", "cancelled")
     .order("created_at");

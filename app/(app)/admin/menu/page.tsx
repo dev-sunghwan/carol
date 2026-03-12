@@ -47,7 +47,7 @@ export default async function AdminMenuPage() {
                 <CardHeader className="pb-2">
                   <div className="flex items-center justify-between">
                     <CardTitle className="text-base">
-                      Week of {formatLunchDate(week.week_start)}
+                      Week of {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(week.week_start + "T12:00:00Z"))}
                     </CardTitle>
                     <div className="flex items-center gap-2">
                       <Badge variant={week.is_published ? "default" : "secondary"}>

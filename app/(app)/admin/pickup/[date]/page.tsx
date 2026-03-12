@@ -16,7 +16,7 @@ export default async function PickupPage({ params }: Props) {
 
   const { data: orders } = await supabase
     .from("orders")
-    .select("*, profiles(full_name, email), menu_items(name)")
+    .select("*, profiles!orders_user_id_fkey(full_name, email), menu_items(name)")
     .eq("order_date", date)
     .neq("status", "cancelled")
     .order("status")

@@ -3,7 +3,7 @@
 import { useState, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -113,17 +113,15 @@ export function MenuImportDialog({ restaurantId }: MenuImportDialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) reset(); }}>
-      <DialogTrigger asChild={false}>
-        <Button variant="outline" size="sm" onClick={() => setOpen(true)}>
-          Import PPTX
-        </Button>
+      <DialogTrigger className={buttonVariants({ variant: "outline", size: "sm" })}>
+        Import PPTX
       </DialogTrigger>
-      <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
-        <DialogHeader>
+      <DialogContent className="sm:max-w-5xl w-[95vw] max-h-[92vh] flex flex-col">
+        <DialogHeader className="shrink-0">
           <DialogTitle>Import Menu from PPTX</DialogTitle>
         </DialogHeader>
 
-        <div className="space-y-4">
+        <div className="flex-1 overflow-y-auto space-y-4 pr-1">
           {/* File + date inputs */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-1">
@@ -213,17 +211,21 @@ export function MenuImportDialog({ restaurantId }: MenuImportDialogProps) {
                 </table>
               </div>
 
-              <div className="flex gap-2 justify-end">
-                <Button variant="ghost" size="sm" onClick={reset} disabled={isPending}>
-                  Reset
-                </Button>
-                <Button size="sm" onClick={handleImport} disabled={isPending}>
-                  {isPending ? "Importing…" : `Import ${preview.length} items`}
-                </Button>
-              </div>
             </div>
           )}
         </div>
+
+        {/* Sticky footer — always visible */}
+        {preview && (
+          <div className="shrink-0 flex gap-2 justify-end pt-3 border-t mt-2">
+            <Button variant="ghost" size="sm" onClick={reset} disabled={isPending}>
+              Reset
+            </Button>
+            <Button onClick={handleImport} disabled={isPending}>
+              {isPending ? "Importing…" : `Import ${preview.length} items`}
+            </Button>
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   );

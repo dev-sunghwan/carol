@@ -30,7 +30,8 @@ interface UserTableProps {
 }
 
 interface EditState {
-  full_name: string;
+  first_name: string;
+  last_name: string;
   phone: string;
 }
 
@@ -38,13 +39,17 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
   const [users, setUsers] = useState(initialUsers);
   const [pending, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [editState, setEditState] = useState<EditState>({ full_name: "", phone: "" });
+  const [editState, setEditState] = useState<EditState>({ first_name: "", last_name: "", phone: "" });
   const router = useRouter();
 
   function startEdit(user: Profile) {
     setEditingId(user.id);
+    const nameParts = (user.full_name ?? "").split(" ");
+    const lastName = nameParts.length > 1 ? nameParts.pop()! : "";
+    const firstName = nameParts.join(" ");
     setEditState({
-      full_name: user.full_name ?? "",
+      first_name: firstName,
+      last_name: lastName,
       phone: (user as any).phone ?? "",
     });
   }
@@ -55,8 +60,9 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
 
   function saveEdit(userId: string) {
     startTransition(async () => {
+      const fullName = [editState.first_name.trim(), editState.last_name.trim()].filter(Boolean).join(" ");
       const result = await updateUserProfile(userId, {
-        full_name: editState.full_name || undefined,
+        full_name: fullName || undefined,
         phone: editState.phone || undefined,
       });
       if (!result.success) {
@@ -66,7 +72,7 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
         setUsers((prev) =>
           prev.map((u) =>
             u.id === userId
-              ? { ...u, full_name: editState.full_name || null, phone: editState.phone || null } as any
+              ? { ...u, full_name: fullName || null, phone: editState.phone || null } as any
               : u
           )
         );
@@ -136,12 +142,20 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
               <TableRow key={user.id}>
                 <TableCell>
                   {isEditing ? (
-                    <Input
-                      value={editState.full_name}
-                      onChange={(e) => setEditState((s) => ({ ...s, full_name: e.target.value }))}
-                      placeholder="Full name"
-                      className="h-7 text-sm w-40"
-                    />
+                    <div className="flex gap-1">
+                      <Input
+                        value={editState.first_name}
+                        onChange={(e) => setEditState((s) => ({ ...s, first_name: e.target.value }))}
+                        placeholder="First name"
+                        className="h-7 text-sm w-24"
+                      />
+                      <Input
+                        value={editState.last_name}
+                        onChange={(e) => setEditState((s) => ({ ...s, last_name: e.target.value }))}
+                        placeholder="Last name"
+                        className="h-7 text-sm w-24"
+                      />
+                    </div>
                   ) : (
                     <div>
                       <p className="font-medium text-sm">{user.full_name ?? "—"}</p>

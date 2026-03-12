@@ -1,8 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import Link from "next/link";
-import { formatLunchDate } from "@/lib/cutoff";
 
 function getTodayDateStr() {
   return new Date().toISOString().slice(0, 10);
@@ -15,7 +13,6 @@ export default async function AdminDashboard() {
   const [
     { count: todayOrderCount },
     { count: pendingExceptionCount },
-    { data: submissions },
     { data: recentOrders },
   ] = await Promise.all([
     supabase
@@ -28,32 +25,13 @@ export default async function AdminDashboard() {
       .select("*", { count: "exact", head: true })
       .eq("status", "pending"),
     supabase
-      .from("restaurant_submission_log")
-      .select("*")
-      .eq("order_date", today),
-    supabase
       .from("orders")
-      .select("id, status, order_date, profiles(full_name, email), menu_items(name)")
+      .select("id, status, guest_name, profiles!orders_user_id_fkey(full_name, email)")
       .eq("order_date", today)
       .neq("status", "cancelled")
       .order("created_at", { ascending: false })
       .limit(10),
   ]);
-
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const submissionStatus: string = (submissions as any)?.[0]?.status ?? "not_submitted";
-  const submissionLabels: Record<string, string> = {
-    not_submitted: "Not Submitted",
-    submitted: "Submitted",
-    confirmed: "Confirmed",
-    issue_reported: "Issue Reported",
-  };
-  const submissionVariant: Record<string, "outline" | "default" | "destructive" | "secondary"> = {
-    not_submitted: "secondary",
-    submitted: "default",
-    confirmed: "default",
-    issue_reported: "destructive",
-  };
 
   const noShowCandidateCount = (recentOrders ?? []).filter(
     (o) => o.status === "no_show_candidate"
@@ -61,33 +39,20 @@ export default async function AdminDashboard() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-6">
-        Admin Dashboard — {formatLunchDate(today)}
+      <h1 className="text-2xl font-bold tracking-tight mb-6">
+        Admin Dashboard — {new Intl.DateTimeFormat("en-GB", { weekday: "short", day: "numeric", month: "short", year: "numeric" }).format(new Date(today + "T12:00:00Z"))}
       </h1>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
         <Card>
           <CardHeader className="pb-1">
             <CardTitle className="text-sm text-muted-foreground">Today&apos;s Orders</CardTitle>
           </CardHeader>
           <CardContent>
             <p className="text-3xl font-bold">{todayOrderCount ?? 0}</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="pb-1">
-            <CardTitle className="text-sm text-muted-foreground">Restaurant Submission</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <Badge variant={submissionVariant[submissionStatus]}>
-              {submissionLabels[submissionStatus]}
-            </Badge>
-            <div className="mt-2">
-              <Link href={`/admin/submissions/${today}`} className="text-xs text-blue-600 underline">
-                Update →
-              </Link>
-            </div>
+            <Link href={`/admin/daily/${today}`} className="text-xs text-blue-600 underline">
+              View list →
+            </Link>
           </CardContent>
         </Card>
 
@@ -134,22 +99,24 @@ export default async function AdminDashboard() {
             <table className="w-full text-sm">
               <thead className="bg-gray-50 border-b">
                 <tr>
+                  <th className="text-left px-4 py-2 font-medium">#</th>
                   <th className="text-left px-4 py-2 font-medium">Employee</th>
-                  <th className="text-left px-4 py-2 font-medium">Menu Item</th>
                   <th className="text-left px-4 py-2 font-medium">Status</th>
                 </tr>
               </thead>
               <tbody>
-                {(recentOrders as unknown as Array<{id: string; status: string; profiles: {full_name: string|null; email: string}|null; menu_items: {name: string}|null}>).map((order) => {
+                {(recentOrders as unknown as Array<{id: string; status: string; guest_name: string|null; profiles: {full_name: string|null; email: string}|null}>).map((order, i) => {
                   const profile = order.profiles;
-                  const menuItem = order.menu_items;
+                  const displayName = order.guest_name
+                    ? "Guest"
+                    : (profile?.full_name ?? profile?.email ?? "Unknown");
                   return (
                     <tr key={order.id} className="border-b last:border-0">
+                      <td className="px-4 py-2 text-muted-foreground">{i + 1}</td>
                       <td className="px-4 py-2">
-                        {profile?.full_name ?? profile?.email ?? "Unknown"}
+                        {displayName}
                       </td>
-                      <td className="px-4 py-2 text-muted-foreground">{menuItem?.name}</td>
-                      <td className="px-4 py-2 capitalize">{order.status.replace("_", " ")}</td>
+                      <td className="px-4 py-2 capitalize">{order.status.replace(/_/g, " ")}</td>
                     </tr>
                   );
                 })}
@@ -159,10 +126,10 @@ export default async function AdminDashboard() {
         )}
       </div>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
         {[
+          { href: `/admin/daily/${today}`, label: "Today's Orders" },
           { href: `/admin/pickup/${today}`, label: "Manage Pickup" },
-          { href: `/admin/submissions/${today}`, label: "Update Submission" },
           { href: "/admin/exceptions", label: "Exception Requests" },
           { href: "/admin/announcements/new", label: "Post Announcement" },
         ].map((link) => (

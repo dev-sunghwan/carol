@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { UserTable } from "@/components/admin/UserTable";
+import { InviteUserDialog } from "@/components/admin/InviteUserDialog";
 
 export default async function AdminUsersPage() {
   const supabase = await createClient();
@@ -11,9 +12,12 @@ export default async function AdminUsersPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-2">User Management</h1>
+      <div className="flex items-center justify-between mb-2">
+        <h1 className="text-xl font-bold">User Management</h1>
+        <InviteUserDialog />
+      </div>
       <p className="text-sm text-muted-foreground mb-6">
-        Control who can place orders (allowlist) and assign admin roles.
+        Invite staff members directly. Invited users are automatically approved to order.
       </p>
       <UserTable users={users ?? []} />
     </div>

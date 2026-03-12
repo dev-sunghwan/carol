@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,6 +12,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export default function LoginPage() {
   const supabase = createClient();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const next = searchParams.get("next") ?? "/";
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,15 +28,14 @@ export default function LoginPage() {
     }
     setLoading(true);
     setMessage(null);
-    const { error } = await supabase.auth.signInWithOtp({
-      email,
-      options: { emailRedirectTo: `${window.location.origin}/auth/callback` },
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${window.location.origin}/auth/callback?next=/update-password`,
     });
     setLoading(false);
     if (error) {
       setMessage({ type: "error", text: error.message });
     } else {
-      setMessage({ type: "success", text: "Check your email for a sign-in link." });
+      setMessage({ type: "success", text: "Check your email for a password setup link." });
     }
   }
 
@@ -48,8 +51,9 @@ export default function LoginPage() {
     setLoading(false);
     if (error) {
       setMessage({ type: "error", text: error.message });
+    } else {
+      router.push(next);
     }
-    // On success, middleware redirects to /
   }
 
   return (
@@ -77,30 +81,11 @@ export default function LoginPage() {
               </Alert>
             )}
 
-            <Tabs defaultValue="magic">
+            <Tabs defaultValue="password">
               <TabsList className="w-full mb-4">
-                <TabsTrigger value="magic" className="flex-1">Magic link</TabsTrigger>
-                <TabsTrigger value="password" className="flex-1">Password</TabsTrigger>
+                <TabsTrigger value="password" className="flex-1">Sign in</TabsTrigger>
+                <TabsTrigger value="setup" className="flex-1">First time?</TabsTrigger>
               </TabsList>
-
-              <TabsContent value="magic">
-                <form onSubmit={handleMagicLink} className="space-y-4">
-                  <div>
-                    <Label htmlFor="email-magic">Email</Label>
-                    <Input
-                      id="email-magic"
-                      type="email"
-                      placeholder="you@hanwha.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Sending…" : "Send sign-in link"}
-                  </Button>
-                </form>
-              </TabsContent>
 
               <TabsContent value="password">
                 <form onSubmit={handlePassword} className="space-y-4">
@@ -128,6 +113,28 @@ export default function LoginPage() {
                   </div>
                   <Button type="submit" className="w-full" disabled={loading}>
                     {loading ? "Signing in…" : "Sign in"}
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="setup">
+                <form onSubmit={handleMagicLink} className="space-y-4">
+                  <p className="text-sm text-muted-foreground">
+                    Enter your registered email to receive a password setup link.
+                  </p>
+                  <div>
+                    <Label htmlFor="email-setup">Email</Label>
+                    <Input
+                      id="email-setup"
+                      type="email"
+                      placeholder="you@hanwha.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </div>
+                  <Button type="submit" className="w-full" disabled={loading}>
+                    {loading ? "Sending…" : "Send setup link"}
                   </Button>
                 </form>
               </TabsContent>

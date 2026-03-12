@@ -112,7 +112,7 @@ export function MenuWeekEditor({
       <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-xl font-bold">
-            Week of {formatLunchDate(menuWeek.week_start)}
+            Week of {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(menuWeek.week_start + "T12:00:00Z"))}
           </h1>
         </div>
         <div className="flex items-center gap-3">
@@ -137,26 +137,26 @@ export function MenuWeekEditor({
 
           return (
             <div key={date} className="space-y-2">
-              <div>
-                <p className="text-sm font-semibold">{DAY_LABELS[idx]}</p>
-                <p className="text-xs text-muted-foreground">{formatLunchDate(date)}</p>
+              <div className="text-center">
+                <p className="text-base font-semibold">{DAY_LABELS[idx]}</p>
+                <p className="text-sm text-muted-foreground">{formatLunchDate(date)}</p>
               </div>
 
               {dayItems.map((item) => (
-                <Card key={item.id} className="text-xs">
+                <Card key={item.id}>
                   <CardContent className="pt-3 pb-3">
-                    <p className="font-medium">{item.name}</p>
+                    <p className="text-sm font-semibold">{item.name}</p>
                     {item.description && (
-                      <p className="text-muted-foreground mt-0.5">{item.description}</p>
+                      <p className="text-sm text-muted-foreground mt-0.5">{item.description}</p>
                     )}
                     {!item.is_available && (
                       <Badge variant="secondary" className="text-xs mt-1">Unavailable</Badge>
                     )}
-                    <div className="flex gap-1 mt-2">
+                    <div className="flex justify-between mt-2">
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 px-2 text-xs"
+                        className="h-7 px-2 text-sm"
                         onClick={() => openEditForm(item)}
                       >
                         Edit
@@ -164,7 +164,7 @@ export function MenuWeekEditor({
                       <Button
                         variant="ghost"
                         size="sm"
-                        className="h-6 px-2 text-xs text-red-600"
+                        className="h-7 px-2 text-sm text-red-600"
                         onClick={() => handleDelete(item.id)}
                         disabled={isPending}
                       >
@@ -178,7 +178,7 @@ export function MenuWeekEditor({
               <Button
                 variant="outline"
                 size="sm"
-                className="w-full text-xs h-7"
+                className="w-full text-sm"
                 onClick={() => openAddForm(dayOfWeek)}
               >
                 + Add

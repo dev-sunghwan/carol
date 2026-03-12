@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { writeAuditLog } from "@/lib/audit";
+import { formatAuditDate } from "@/lib/cutoff";
 import type { ActionResult } from "@/lib/validation/order";
 
 async function requireAdmin() {
@@ -42,10 +43,10 @@ export async function adminMarkPickedUp(orderId: string): Promise<ActionResult> 
   await writeAuditLog({
     actorId: user.id,
     actorEmail: adminEmail,
-    action: "order.picked_up",
+    action: `Pickup confirmed (admin) — ${formatAuditDate(order.order_date)}`,
     targetType: "order",
     targetId: orderId,
-    metadata: { method: "admin_check", order_date: order.order_date },
+    metadata: { date: order.order_date, by: adminEmail },
   });
 
   revalidatePath(`/admin/pickup/${order.order_date}`);
@@ -74,10 +75,10 @@ export async function markNoShowCandidate(orderId: string): Promise<ActionResult
   await writeAuditLog({
     actorId: user.id,
     actorEmail: adminEmail,
-    action: "order.no_show_candidate",
+    action: `No-show flagged — ${formatAuditDate(order?.order_date ?? "")}`,
     targetType: "order",
     targetId: orderId,
-    metadata: { order_date: order?.order_date },
+    metadata: { date: order?.order_date, by: adminEmail },
   });
 
   revalidatePath(`/admin/pickup/${order?.order_date}`);
@@ -106,10 +107,10 @@ export async function confirmNoShow(orderId: string): Promise<ActionResult> {
   await writeAuditLog({
     actorId: user.id,
     actorEmail: adminEmail,
-    action: "order.no_show",
+    action: `No-show confirmed — ${formatAuditDate(order?.order_date ?? "")}`,
     targetType: "order",
     targetId: orderId,
-    metadata: { order_date: order?.order_date },
+    metadata: { date: order?.order_date, by: adminEmail },
   });
 
   revalidatePath(`/admin/pickup/${order?.order_date}`);
@@ -145,10 +146,10 @@ export async function bulkMarkNoShowCandidates(orderDate: string): Promise<Actio
   await writeAuditLog({
     actorId: user.id,
     actorEmail: adminEmail,
-    action: "orders.bulk_no_show_candidate",
+    action: `No-show bulk flagged — ${formatAuditDate(orderDate)}`,
     targetType: "orders",
     targetId: orderDate,
-    metadata: { order_date: orderDate, affected_ids: candidateIds, count: candidateIds.length },
+    metadata: { date: orderDate, count: candidateIds.length, by: adminEmail },
   });
 
   revalidatePath(`/admin/pickup/${orderDate}`);

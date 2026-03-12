@@ -70,11 +70,11 @@ export default async function HomePage() {
         </Alert>
       )}
 
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-bold">This Week&apos;s Menu</h1>
-          <p className="text-sm text-muted-foreground">
-            Week of {formatLunchDate(weekStart)}
+          <h1 className="text-2xl font-bold tracking-tight">This Week&apos;s Menu</h1>
+          <p className="text-sm text-muted-foreground mt-0.5">
+            Week of {new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short", year: "numeric" }).format(new Date(weekStart + "T12:00:00Z"))}
           </p>
         </div>
       </div>

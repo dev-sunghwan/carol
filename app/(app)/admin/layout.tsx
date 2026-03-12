@@ -8,7 +8,6 @@ const adminNavLinks = [
   { href: "/admin/daily", label: "Daily Orders" },
   { href: "/admin/users", label: "Users" },
   { href: "/admin/menu", label: "Menu" },
-  { href: "/admin/submissions", label: "Submissions" },
   { href: "/admin/exceptions", label: "Exception Requests" },
   { href: "/admin/pickup", label: "Pickup / No-show" },
   { href: "/admin/announcements", label: "Announcements" },
@@ -30,21 +29,21 @@ export default async function AdminLayout({ children }: { children: React.ReactN
 
   return (
     <div>
-      <div className="mb-4">
-        <p className="text-xs font-semibold uppercase tracking-widest text-muted-foreground mb-2">Admin</p>
-        <nav className="flex flex-wrap gap-1">
+      <div className="mb-5">
+        <p className="text-[11px] font-semibold uppercase tracking-widest text-muted-foreground mb-2.5">Admin</p>
+        <nav className="flex flex-wrap gap-1.5">
           {adminNavLinks.map((link) => (
             <Link
               key={link.href}
               href={link.href}
-              className="text-xs px-3 py-1.5 rounded-md bg-white border hover:bg-gray-50 transition-colors"
+              className="text-sm px-3.5 py-1.5 rounded-md bg-white border hover:bg-orange-50 hover:border-orange-200 hover:text-orange-700 transition-colors font-medium"
             >
               {link.label}
             </Link>
           ))}
         </nav>
       </div>
-      <Separator className="mb-6" />
+      <Separator className="mb-7" />
       {children}
     </div>
   );

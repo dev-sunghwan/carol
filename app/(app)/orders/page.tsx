@@ -6,6 +6,7 @@ import { OrderStatusBadge } from "@/components/orders/OrderStatusBadge";
 import { CancelOrderDialog } from "@/components/orders/CancelOrderDialog";
 import { isCutoffPassed, formatLunchDate, getWeekStart } from "@/lib/cutoff";
 import { ButtonLink } from "@/components/ui/button-link";
+import { PickupButton } from "@/components/orders/PickupButton";
 import type { Order, MenuItem } from "@/lib/types/database.types";
 
 type OrderWithMenu = Order & {
@@ -18,6 +19,7 @@ export default async function OrdersPage() {
   if (!user) redirect("/login");
 
   const now = new Date();
+  const today = new Intl.DateTimeFormat("en-CA", { timeZone: "Europe/London" }).format(now);
   const weekStart = getWeekStart(now);
   const monthStart = `${now.getUTCFullYear()}-${String(now.getUTCMonth() + 1).padStart(2, "0")}-01`;
 
@@ -49,6 +51,11 @@ export default async function OrdersPage() {
             ["placed", "submitted"].includes(order.status);
           const cutoffPassed = isCutoffPassed(order.order_date);
           const isActive = !["cancelled", "no_show"].includes(order.status);
+          const isToday = order.order_date === today;
+          const canSelfPickup =
+            isToday &&
+            cutoffPassed &&
+            ["placed", "submitted", "delivered"].includes(order.status);
 
           return (
             <Card key={order.id} className={order.status === "cancelled" ? "opacity-60" : ""}>
@@ -78,7 +85,10 @@ export default async function OrdersPage() {
                         orderDate={formatLunchDate(order.order_date)}
                       />
                     )}
-                    {isActive && cutoffPassed && order.status !== "picked_up" && (
+                    {canSelfPickup && (
+                      <PickupButton orderId={order.id} size="sm" />
+                    )}
+                    {isActive && cutoffPassed && order.status !== "picked_up" && !canSelfPickup && (
                       <ButtonLink variant="outline" size="sm" href={`/exception-requests/new?orderId=${order.id}&type=late_cancel`}>
                         Request Help
                       </ButtonLink>

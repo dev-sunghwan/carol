@@ -180,3 +180,17 @@ export function formatLunchDate(dateStr: string): string {
     month: "short",
   }).format(d);
 }
+
+/**
+ * Format a YYYY-MM-DD for audit log messages (e.g. "Wed 12 Mar 2026")
+ */
+export function formatAuditDate(dateStr: string): string {
+  const d = new Date(dateStr + "T12:00:00Z");
+  return new Intl.DateTimeFormat("en-GB", {
+    timeZone: TIMEZONE,
+    weekday: "short",
+    day: "numeric",
+    month: "short",
+    year: "numeric",
+  }).format(d);
+}

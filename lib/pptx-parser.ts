@@ -31,16 +31,17 @@ function extractText(node: unknown): string {
 
   const obj = node as Record<string, unknown>;
 
-  // a:t = text run
+  // a:t = text run — return immediately
   if ("a:t" in obj) {
     const t = obj["a:t"];
     if (typeof t === "string") return t;
     if (Array.isArray(t)) return t.join("");
   }
 
-  // Recurse into all child nodes
-  return Object.values(obj)
-    .map(extractText)
+  // Recurse into child elements only — skip XML attributes (keys starting with @_)
+  return Object.entries(obj)
+    .filter(([key]) => !key.startsWith("@_"))
+    .map(([, val]) => extractText(val))
     .join("");
 }
 
@@ -128,7 +129,7 @@ export async function parsePptxMenu(buffer: ArrayBuffer): Promise<ParsedMenu> {
 
     for (const frame of frames) {
       const tbl =
-        frame?.["p:graphic"]?.["a:graphicData"]?.["a:tbl"];
+        frame?.["a:graphic"]?.["a:graphicData"]?.["a:tbl"];
       if (!tbl) continue;
 
       const rows = parseTable(tbl as Record<string, unknown>);

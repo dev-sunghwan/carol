@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { writeAuditLog } from "@/lib/audit";
-import { isCutoffPassed, getCutoffForDate, getWeekStart } from "@/lib/cutoff";
+import { isCutoffPassed, getCutoffForDate, getWeekStart, formatAuditDate } from "@/lib/cutoff";
 import type { ActionResult } from "@/lib/validation/order";
 
 // ============================================================
@@ -89,10 +89,10 @@ export async function placeOrder(
   await writeAuditLog({
     actorId: user.id,
     actorEmail: profile.email,
-    action: "order.placed",
+    action: `Order placed — ${formatAuditDate(orderDate)}`,
     targetType: "order",
     targetId: newOrder.id,
-    metadata: { order_date: orderDate, menu_item_id: menuItemId },
+    metadata: { date: orderDate, item: menuItem.name, by: profile.email },
   });
 
   revalidatePath("/");
@@ -151,10 +151,10 @@ export async function cancelOrder(orderId: string): Promise<ActionResult> {
   await writeAuditLog({
     actorId: user.id,
     actorEmail: profile?.email ?? null,
-    action: "order.cancelled",
+    action: `Order cancelled — ${formatAuditDate(order.order_date)}`,
     targetType: "order",
     targetId: orderId,
-    metadata: { order_date: order.order_date },
+    metadata: { date: order.order_date, by: profile?.email ?? user.id },
   });
 
   revalidatePath("/orders");
@@ -212,13 +212,18 @@ export async function submitExceptionRequest(
     return { success: false, error: { code: "DB_ERROR", message: insertError?.message ?? "Unknown error" } };
   }
 
+  const typeLabel: Record<string, string> = {
+    late_cancel: "late cancellation",
+    late_order: "late order",
+    other: "general",
+  };
   await writeAuditLog({
     actorId: user.id,
     actorEmail: profile.email,
-    action: "exception_request.created",
+    action: `Exception request — ${typeLabel[requestType] ?? requestType}`,
     targetType: "exception_request",
     targetId: req.id,
-    metadata: { request_type: requestType, order_id: orderId ?? null },
+    metadata: { type: requestType, by: profile.email },
   });
 
   revalidatePath("/orders");
@@ -236,7 +241,7 @@ export async function selfPickup(orderId: string): Promise<ActionResult> {
 
   const { data: order } = await supabase
     .from("orders")
-    .select("user_id, status")
+    .select("user_id, status, order_date")
     .eq("id", orderId)
     .single();
 
@@ -258,10 +263,10 @@ export async function selfPickup(orderId: string): Promise<ActionResult> {
   await writeAuditLog({
     actorId: user.id,
     actorEmail: profile?.email ?? null,
-    action: "order.picked_up",
+    action: `Pickup confirmed — ${formatAuditDate(order.order_date)}`,
     targetType: "order",
     targetId: orderId,
-    metadata: { method: "self_check" },
+    metadata: { date: order.order_date, by: profile?.email ?? user.id },
   });
 
   revalidatePath("/orders");
