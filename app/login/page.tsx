@@ -143,9 +143,10 @@ export default function LoginPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <div className="flex justify-center mb-4">
-            <Image src="/carol-logo.svg" alt="Carol" width={320} height={120} priority />
+          <div className="flex justify-center mb-3">
+            <Image src="/hv-logo.png" alt="Hanwha Vision" width={220} height={60} priority />
           </div>
+          <p className="font-serif font-bold italic text-6xl text-[#1F3A5F] leading-tight">Carol</p>
           <p className="text-base text-gray-500 mt-2">EHQ Korean Lunch Ordering Platform</p>
         </div>
         <Suspense>
