@@ -27,7 +27,7 @@ export default async function AdminMenuPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">Menu Management</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Menu Management</h1>
         <div className="flex gap-2">
           <MenuImportDialog restaurantId={restaurantId} />
           <ButtonLink size="sm" href="/admin/menu/new">+ New Week</ButtonLink>

@@ -34,7 +34,7 @@ export default async function ExceptionReviewPage({ params }: Props) {
       </div>
 
       <div className="mb-4">
-        <h1 className="text-xl font-bold">Exception Request</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Exception Request</h1>
         <p className="text-sm text-muted-foreground">
           From: {profile?.full_name ?? profile?.email ?? "Unknown"}
         </p>

@@ -29,7 +29,7 @@ export default async function PickupPage({ params }: Props) {
           ← Admin Dashboard
         </Link>
       </div>
-      <h1 className="text-xl font-bold mb-1">Pickup & No-show</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-1">Pickup & No-show</h1>
       <p className="text-sm text-muted-foreground mb-6">{formatLunchDate(date)}</p>
 
       <PickupChecklist orders={orders ?? []} date={date} />

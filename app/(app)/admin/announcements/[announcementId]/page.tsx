@@ -26,7 +26,7 @@ export default async function EditAnnouncementPage({ params }: Props) {
           ← Back to Announcements
         </Link>
       </div>
-      <h1 className="text-xl font-bold mb-6">Edit Announcement</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-6">Edit Announcement</h1>
       <AnnouncementForm announcement={announcement} />
     </div>
   );

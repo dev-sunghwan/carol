@@ -16,7 +16,7 @@ export default async function AdminAnnouncementsPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-xl font-bold">Announcements</h1>
+        <h1 className="text-2xl font-bold tracking-tight">Announcements</h1>
         <ButtonLink size="sm" href="/admin/announcements/new">+ New</ButtonLink>
       </div>
 

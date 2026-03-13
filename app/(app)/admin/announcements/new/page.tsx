@@ -9,7 +9,7 @@ export default function NewAnnouncementPage() {
           ← Back to Announcements
         </Link>
       </div>
-      <h1 className="text-xl font-bold mb-6">New Announcement</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-6">New Announcement</h1>
       <AnnouncementForm />
     </div>
   );

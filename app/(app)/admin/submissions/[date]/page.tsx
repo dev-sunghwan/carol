@@ -35,7 +35,7 @@ export default async function SubmissionDatePage({ params }: Props) {
           ← Back to Submissions
         </Link>
       </div>
-      <h1 className="text-xl font-bold mb-1">Submission — {formatLunchDate(date)}</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-1">Submission — {formatLunchDate(date)}</h1>
       <p className="text-sm text-muted-foreground mb-6">{orderCount ?? 0} active orders</p>
 
       <SubmissionStatusForm

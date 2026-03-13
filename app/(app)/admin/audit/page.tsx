@@ -47,7 +47,7 @@ export default async function AuditLogPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-6">Audit Log</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-6">Audit Log</h1>
       <p className="text-sm text-muted-foreground mb-4">
         Last 200 entries. Read-only.
       </p>

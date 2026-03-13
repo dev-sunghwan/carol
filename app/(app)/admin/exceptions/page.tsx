@@ -68,7 +68,7 @@ export default async function AdminExceptionsPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-6">Exception Requests</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-6">Exception Requests</h1>
 
       {pending.length > 0 && (
         <div className="mb-6">

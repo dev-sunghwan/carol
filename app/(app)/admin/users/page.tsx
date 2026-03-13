@@ -13,7 +13,7 @@ export default async function AdminUsersPage() {
   return (
     <div>
       <div className="flex items-center justify-between mb-2">
-        <h1 className="text-xl font-bold">User Management</h1>
+        <h1 className="text-2xl font-bold tracking-tight">User Management</h1>
         <InviteUserDialog />
       </div>
       <p className="text-sm text-muted-foreground mb-6">

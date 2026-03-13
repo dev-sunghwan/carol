@@ -43,7 +43,7 @@ export default async function AdminSubmissionsPage() {
 
   return (
     <div>
-      <h1 className="text-xl font-bold mb-6">Restaurant Submissions</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-6">Restaurant Submissions</h1>
       <p className="text-sm text-muted-foreground mb-4">
         Week of {formatLunchDate(weekStart)}
       </p>
