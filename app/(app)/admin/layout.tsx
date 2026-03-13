@@ -11,6 +11,7 @@ const adminNavLinks = [
   { href: "/admin/exceptions", label: "Exception Requests" },
   { href: "/admin/pickup", label: "Pickup / No-show" },
   { href: "/admin/announcements", label: "Announcements" },
+  { href: "/admin/export", label: "Export" },
   { href: "/admin/audit", label: "Audit Log" },
 ];
 

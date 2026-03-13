@@ -92,7 +92,7 @@ export function DayLunchCard({ dayName, date, menuItems, existingOrder, isAllowe
                   <div className="min-w-0">
                     <p className="text-base font-semibold leading-snug">{item.name}</p>
                     {item.description && (
-                      <p className="text-sm text-muted-foreground leading-snug mt-0.5">{item.description}</p>
+                      <p className="text-base text-muted-foreground leading-snug mt-0.5">{item.description}</p>
                     )}
                   </div>
                 </div>

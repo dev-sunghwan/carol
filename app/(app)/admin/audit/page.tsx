@@ -1,6 +1,41 @@
 import { createClient } from "@/lib/supabase/server";
 import { formatDistanceToNow } from "date-fns";
 
+const TARGET_LABELS: Record<string, string> = {
+  order: "Order",
+  user: "User",
+  profile: "Profile",
+  menu: "Menu",
+  guest_order: "Guest Order",
+};
+
+const META_LABELS: Record<string, string> = {
+  date: "Date",
+  item: "Item",
+  by: "By",
+  email: "Email",
+  name: "Name",
+  from: "From",
+  to: "To",
+  access: "Access",
+  count: "Count",
+  type: "Type",
+  order_id: "Order",
+  user: "User",
+};
+
+function formatTarget(targetType: string | null): string {
+  if (!targetType) return "—";
+  return TARGET_LABELS[targetType] ?? targetType;
+}
+
+function formatMetadata(metadata: Record<string, unknown> | null): string {
+  if (!metadata || Object.keys(metadata).length === 0) return "—";
+  return Object.entries(metadata)
+    .map(([k, v]) => `${META_LABELS[k] ?? k}: ${v}`)
+    .join(" · ");
+}
+
 export default async function AuditLogPage() {
   const supabase = await createClient();
 
@@ -42,12 +77,12 @@ export default async function AuditLogPage() {
                   {formatDistanceToNow(new Date(log.created_at), { addSuffix: true })}
                 </td>
                 <td className="px-3 py-2 text-muted-foreground">{log.actor_email ?? "—"}</td>
-                <td className="px-3 py-2 font-mono">{log.action}</td>
+                <td className="px-3 py-2">{log.action}</td>
                 <td className="px-3 py-2 text-muted-foreground">
-                  {log.target_type && `${log.target_type}:${log.target_id?.slice(0, 8)}`}
+                  {formatTarget(log.target_type)}
                 </td>
-                <td className="px-3 py-2 text-muted-foreground max-w-xs truncate">
-                  {log.metadata ? JSON.stringify(log.metadata) : "—"}
+                <td className="px-3 py-2 text-muted-foreground max-w-xs">
+                  {formatMetadata(log.metadata as Record<string, unknown> | null)}
                 </td>
               </tr>
             ))}

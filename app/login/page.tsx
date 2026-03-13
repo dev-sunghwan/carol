@@ -78,7 +78,7 @@ function LoginForm() {
         <Tabs defaultValue="password">
           <TabsList className="w-full mb-4">
             <TabsTrigger value="password" className="flex-1">Sign in</TabsTrigger>
-            <TabsTrigger value="setup" className="flex-1">First time?</TabsTrigger>
+            <TabsTrigger value="setup" className="flex-1">Reset password</TabsTrigger>
           </TabsList>
 
           <TabsContent value="password">
@@ -114,7 +114,7 @@ function LoginForm() {
           <TabsContent value="setup">
             <form onSubmit={handleMagicLink} className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Enter your registered email to receive a password setup link.
+                Enter your email to receive a password set/reset link. Use this for first-time setup or if you've forgotten your password.
               </p>
               <div>
                 <Label htmlFor="email-setup">Email</Label>
@@ -144,10 +144,9 @@ export default function LoginPage() {
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
-            <Image src="/hv-logo.png" alt="Hanwha Vision" width={280} height={50} priority />
+            <Image src="/carol-logo.svg" alt="Carol" width={320} height={120} priority />
           </div>
-          <h1 className="text-2xl font-bold text-gray-700">Carol</h1>
-          <p className="text-gray-500 mt-1">EHQ Lunch Ordering Platform</p>
+          <p className="text-base text-gray-500 mt-2">EHQ Korean Lunch Ordering Platform</p>
         </div>
         <Suspense>
           <LoginForm />
