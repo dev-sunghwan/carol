@@ -31,7 +31,7 @@ export async function placeOrder(
   // Fetch menu item + week to determine order_date
   const { data: menuItem } = await supabase
     .from("menu_items")
-    .select("id, day_of_week, is_available, menu_week_id, menu_weeks(week_start)")
+    .select("id, name, day_of_week, is_available, menu_week_id, menu_weeks(week_start)")
     .eq("id", menuItemId)
     .single();
 
