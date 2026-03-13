@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -10,7 +10,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
-export default function LoginPage() {
+function LoginForm() {
   const supabase = createClient();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -57,90 +57,97 @@ export default function LoginPage() {
   }
 
   return (
+    <Card>
+      <CardHeader>
+        <CardTitle>Sign in</CardTitle>
+        <CardDescription>
+          Use your <strong>@hanwha.com</strong> email address.
+        </CardDescription>
+      </CardHeader>
+      <CardContent>
+        {message && (
+          <Alert
+            variant={message.type === "error" ? "destructive" : "default"}
+            className="mb-4"
+          >
+            <AlertDescription>{message.text}</AlertDescription>
+          </Alert>
+        )}
+
+        <Tabs defaultValue="password">
+          <TabsList className="w-full mb-4">
+            <TabsTrigger value="password" className="flex-1">Sign in</TabsTrigger>
+            <TabsTrigger value="setup" className="flex-1">First time?</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="password">
+            <form onSubmit={handlePassword} className="space-y-4">
+              <div>
+                <Label htmlFor="email-pw">Email</Label>
+                <Input
+                  id="email-pw"
+                  type="email"
+                  placeholder="you@hanwha.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <Label htmlFor="password">Password</Label>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Signing in…" : "Sign in"}
+              </Button>
+            </form>
+          </TabsContent>
+
+          <TabsContent value="setup">
+            <form onSubmit={handleMagicLink} className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Enter your registered email to receive a password setup link.
+              </p>
+              <div>
+                <Label htmlFor="email-setup">Email</Label>
+                <Input
+                  id="email-setup"
+                  type="email"
+                  placeholder="you@hanwha.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <Button type="submit" className="w-full" disabled={loading}>
+                {loading ? "Sending…" : "Send setup link"}
+              </Button>
+            </form>
+          </TabsContent>
+        </Tabs>
+      </CardContent>
+    </Card>
+  );
+}
+
+export default function LoginPage() {
+  return (
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">Carol</h1>
           <p className="text-gray-500 mt-1">EHQ Lunch Ordering Platform</p>
         </div>
-
-        <Card>
-          <CardHeader>
-            <CardTitle>Sign in</CardTitle>
-            <CardDescription>
-              Use your <strong>@hanwha.com</strong> email address.
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {message && (
-              <Alert
-                variant={message.type === "error" ? "destructive" : "default"}
-                className="mb-4"
-              >
-                <AlertDescription>{message.text}</AlertDescription>
-              </Alert>
-            )}
-
-            <Tabs defaultValue="password">
-              <TabsList className="w-full mb-4">
-                <TabsTrigger value="password" className="flex-1">Sign in</TabsTrigger>
-                <TabsTrigger value="setup" className="flex-1">First time?</TabsTrigger>
-              </TabsList>
-
-              <TabsContent value="password">
-                <form onSubmit={handlePassword} className="space-y-4">
-                  <div>
-                    <Label htmlFor="email-pw">Email</Label>
-                    <Input
-                      id="email-pw"
-                      type="email"
-                      placeholder="you@hanwha.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="••••••••"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Signing in…" : "Sign in"}
-                  </Button>
-                </form>
-              </TabsContent>
-
-              <TabsContent value="setup">
-                <form onSubmit={handleMagicLink} className="space-y-4">
-                  <p className="text-sm text-muted-foreground">
-                    Enter your registered email to receive a password setup link.
-                  </p>
-                  <div>
-                    <Label htmlFor="email-setup">Email</Label>
-                    <Input
-                      id="email-setup"
-                      type="email"
-                      placeholder="you@hanwha.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                    />
-                  </div>
-                  <Button type="submit" className="w-full" disabled={loading}>
-                    {loading ? "Sending…" : "Send setup link"}
-                  </Button>
-                </form>
-              </TabsContent>
-            </Tabs>
-          </CardContent>
-        </Card>
+        <Suspense>
+          <LoginForm />
+        </Suspense>
       </div>
     </div>
   );
