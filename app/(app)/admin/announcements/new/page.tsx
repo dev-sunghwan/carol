@@ -9,7 +9,10 @@ export default function NewAnnouncementPage() {
           ← Back to Announcements
         </Link>
       </div>
-      <h1 className="text-2xl font-bold tracking-tight mb-6">New Announcement</h1>
+      <h1 className="text-2xl font-bold tracking-tight mb-1">New Announcement</h1>
+      <p className="text-sm text-muted-foreground mb-6">
+        This will appear as a banner on the menu page. Use <strong>Menu Change</strong> for item updates, <strong>Closure</strong> for days with no service, or <strong>General</strong> for other notices.
+      </p>
       <AnnouncementForm />
     </div>
   );

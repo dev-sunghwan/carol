@@ -15,10 +15,13 @@ export default async function AdminAnnouncementsPage() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-6">
+      <div className="flex items-center justify-between mb-1">
         <h1 className="text-2xl font-bold tracking-tight">Announcements</h1>
         <ButtonLink size="sm" href="/admin/announcements/new">+ New</ButtonLink>
       </div>
+      <p className="text-sm text-muted-foreground mb-6">
+        Post notices that appear as a banner on the menu page for all users — e.g. menu changes, restaurant closures, or general reminders. Active announcements are shown immediately; deactivate to hide.
+      </p>
 
       {(!announcements || announcements.length === 0) && (
         <div className="text-center py-16 border rounded-lg bg-white text-muted-foreground">
