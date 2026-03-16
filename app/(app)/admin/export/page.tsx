@@ -35,7 +35,7 @@ export default function ExportPage() {
     const blob = await res.blob();
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `carol-orders-${from}-to-${to}.csv`;
+    a.download = `carol-orders-${from}-to-${to}.xlsx`;
     a.click();
     URL.revokeObjectURL(a.href);
     setLoading(false);
@@ -49,7 +49,8 @@ export default function ExportPage() {
         <CardHeader>
           <CardTitle>Date Range Export</CardTitle>
           <CardDescription>
-            Download all non-cancelled orders within the selected period as a CSV file.
+            Download all non-cancelled orders within the selected period as an Excel file (.xlsx).
+            Includes order list, summary by date, summary by person, and no-show report.
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
@@ -76,12 +77,11 @@ export default function ExportPage() {
           </div>
 
           <Button className="w-full" onClick={handleExport} disabled={loading || !from || !to}>
-            {loading ? "Generating…" : "Download CSV"}
+            {loading ? "Generating…" : "Download Excel"}
           </Button>
 
           <p className="text-xs text-muted-foreground">
-            Includes: Date, Name, Email, Menu Item, Restaurant, Status, Guest flag.
-            Cancelled orders are excluded.
+            Cancelled orders are excluded. Opens directly in Excel or Google Sheets.
           </p>
         </CardContent>
       </Card>
