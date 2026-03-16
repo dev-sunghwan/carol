@@ -21,7 +21,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { setUserAllowed, setUserRole, updateUserProfile } from "@/lib/actions/admin/user.actions";
+import { setUserAllowed, setUserRole, updateUserProfile, generatePasswordResetLink } from "@/lib/actions/admin/user.actions";
 import type { Profile } from "@/lib/types/database.types";
 import { useRouter } from "next/navigation";
 
@@ -40,7 +40,21 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
   const [pending, startTransition] = useTransition();
   const [editingId, setEditingId] = useState<string | null>(null);
   const [editState, setEditState] = useState<EditState>({ first_name: "", last_name: "", phone: "" });
+  const [resetLink, setResetLink] = useState<string | null>(null);
+  const [resetLinkUser, setResetLinkUser] = useState<string | null>(null);
   const router = useRouter();
+
+  function handleGenerateResetLink(userId: string, email: string) {
+    startTransition(async () => {
+      const result = await generatePasswordResetLink(userId);
+      if (!result.success) {
+        toast.error("Failed to generate reset link.");
+      } else {
+        setResetLink(result.data.link);
+        setResetLinkUser(email);
+      }
+    });
+  }
 
   function startEdit(user: Profile) {
     setEditingId(user.id);
@@ -116,6 +130,33 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
   }
 
   return (
+    <>
+    {resetLink && (
+      <div className="mb-4 p-4 border rounded-md bg-amber-50 border-amber-200">
+        <p className="text-sm font-medium text-amber-800 mb-2">
+          Password reset link for <strong>{resetLinkUser}</strong> — copy and share via Teams or chat. Link expires in 1 hour.
+        </p>
+        <div className="flex gap-2 items-center">
+          <Input
+            readOnly
+            value={resetLink}
+            className="text-xs font-mono bg-white"
+            onClick={(e) => (e.target as HTMLInputElement).select()}
+          />
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => {
+              navigator.clipboard.writeText(resetLink);
+              toast.success("Link copied to clipboard.");
+            }}
+          >
+            Copy
+          </Button>
+          <Button size="sm" variant="ghost" onClick={() => setResetLink(null)}>✕</Button>
+        </div>
+      </div>
+    )}
     <div className="border rounded-md bg-white overflow-x-auto">
       <Table>
         <TableHeader>
@@ -232,15 +273,26 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
                       </Button>
                     </div>
                   ) : (
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      className="h-7 text-xs"
-                      onClick={() => startEdit(user)}
-                      disabled={pending}
-                    >
-                      Edit
-                    </Button>
+                    <div className="flex gap-1">
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-xs"
+                        onClick={() => startEdit(user)}
+                        disabled={pending}
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        className="h-7 text-xs text-amber-600 hover:text-amber-700"
+                        onClick={() => handleGenerateResetLink(user.id, user.email)}
+                        disabled={pending}
+                      >
+                        Reset Link
+                      </Button>
+                    </div>
                   )}
                 </TableCell>
               </TableRow>
@@ -249,5 +301,6 @@ export function UserTable({ users: initialUsers }: UserTableProps) {
         </TableBody>
       </Table>
     </div>
+    </>
   );
 }

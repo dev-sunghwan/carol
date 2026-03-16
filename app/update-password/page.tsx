@@ -10,8 +10,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Alert, AlertDescription } from "@/components/ui/alert";
 
 export default function UpdatePasswordPage() {
-  const router = useRouter();
   const supabase = createClient();
+  const router = useRouter();
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [loading, setLoading] = useState(false);
@@ -19,26 +19,23 @@ export default function UpdatePasswordPage() {
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (password.length < 8) {
-      setMessage({ type: "error", text: "Password must be at least 8 characters." });
-      return;
-    }
     if (password !== confirm) {
       setMessage({ type: "error", text: "Passwords do not match." });
       return;
     }
-
+    if (password.length < 8) {
+      setMessage({ type: "error", text: "Password must be at least 8 characters." });
+      return;
+    }
     setLoading(true);
     setMessage(null);
-
     const { error } = await supabase.auth.updateUser({ password });
     setLoading(false);
-
     if (error) {
       setMessage({ type: "error", text: error.message });
     } else {
-      setMessage({ type: "success", text: "Password set successfully. Redirecting…" });
-      setTimeout(() => router.push("/"), 1500);
+      setMessage({ type: "success", text: "Password updated successfully. Redirecting…" });
+      setTimeout(() => router.push("/"), 2000);
     }
   }
 
@@ -46,16 +43,13 @@ export default function UpdatePasswordPage() {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 p-4">
       <div className="w-full max-w-md">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">Carol</h1>
-          <p className="text-gray-500 mt-1">EHQ Lunch Ordering Platform</p>
+          <p className="font-serif font-bold italic text-6xl text-[#1F3A5F] leading-tight">Carol</p>
+          <p className="text-base text-gray-500 mt-2">EHQ Korean Lunch Ordering Platform</p>
         </div>
-
         <Card>
           <CardHeader>
             <CardTitle>Set your password</CardTitle>
-            <CardDescription>
-              Choose a password to complete your account setup.
-            </CardDescription>
+            <CardDescription>Choose a new password for your Carol account.</CardDescription>
           </CardHeader>
           <CardContent>
             {message && (
@@ -68,31 +62,29 @@ export default function UpdatePasswordPage() {
             )}
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="new-password">New Password</Label>
+                <Label htmlFor="password">New password</Label>
                 <Input
-                  id="new-password"
+                  id="password"
                   type="password"
                   placeholder="At least 8 characters"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  disabled={loading}
                 />
               </div>
               <div>
-                <Label htmlFor="confirm-password">Confirm Password</Label>
+                <Label htmlFor="confirm">Confirm password</Label>
                 <Input
-                  id="confirm-password"
+                  id="confirm"
                   type="password"
-                  placeholder="Re-enter password"
+                  placeholder="Re-enter your password"
                   value={confirm}
                   onChange={(e) => setConfirm(e.target.value)}
                   required
-                  disabled={loading}
                 />
               </div>
               <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? "Saving…" : "Set Password"}
+                {loading ? "Saving…" : "Set password"}
               </Button>
             </form>
           </CardContent>

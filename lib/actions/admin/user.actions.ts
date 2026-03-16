@@ -125,6 +125,46 @@ export async function updateUserProfile(
   return { success: true, data: undefined };
 }
 
+export async function generatePasswordResetLink(
+  userId: string
+): Promise<ActionResult<{ link: string }>> {
+  const ctx = await requireAdmin();
+  if (!ctx) return { success: false, error: { code: "NOT_AUTHENTICATED" } };
+
+  const adminClient = createAdminClient();
+
+  const { data: profile } = await ctx.supabase
+    .from("profiles")
+    .select("email")
+    .eq("id", userId)
+    .single();
+
+  if (!profile?.email) return { success: false, error: { code: "DB_ERROR", message: "User not found" } };
+
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://carol-pearl.vercel.app";
+
+  const { data, error } = await adminClient.auth.admin.generateLink({
+    type: "recovery",
+    email: profile.email,
+    options: {
+      redirectTo: `${siteUrl}/auth/callback?next=/update-password`,
+    },
+  });
+
+  if (error) return { success: false, error: { code: "DB_ERROR", message: error.message } };
+
+  await writeAuditLog({
+    actorId: ctx.user.id,
+    actorEmail: ctx.adminEmail,
+    action: "Password reset link generated",
+    targetType: "profile",
+    targetId: userId,
+    metadata: { user: profile.email, by: ctx.adminEmail },
+  });
+
+  return { success: true, data: { link: data.properties.action_link } };
+}
+
 export async function createPreregisteredUser(
   email: string,
   fullName?: string
