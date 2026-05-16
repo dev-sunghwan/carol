@@ -1,73 +1,68 @@
 # Carol
 
-Internal lunch ordering and pickup tracking app for **Hanwha Vision Europe EHQ** staff.
+Carol is an internal lunch ordering and pickup tracking app for **Hanwha Vision Europe EHQ** staff.
 
-Replaces the previous manual workflow (email/chat requests + spreadsheets) with a traceable web app that enforces order cutoffs, tracks pickups, and maintains an audit trail.
+It was built to replace a manual workflow based on email or chat requests plus spreadsheets with a traceable web app that enforces order cutoffs, tracks pickups, and maintains an audit trail.
 
----
+## Project status
+
+The core product is implemented and the main workflows are in place. Wider rollout is currently blocked by an organizational dependency rather than a missing feature: company email delivery and account-integration behavior still need alignment with internal security and IT policies before the service can be used reliably in production.
+
+That constraint is part of the project context. Carol is a functional internal-service prototype that has reached the point where adoption depends on resolving real company-environment issues, not only on writing more application code.
 
 ## Features
 
-### For Staff
-- View the weekly lunch menu (Mon–Fri)
-- Place and cancel lunch orders — cutoff is automatically enforced
-- Self-record pickup via a QR code scan at the counter
-- View order history in My Orders
-- Submit exception requests for post-cutoff situations
+### For staff
 
-### For Admins
-- Publish weekly menus — enter items manually or import via PPTX upload
-- Manage users: grant/revoke ordering access, change roles, pre-register accounts
-- Daily order view with CSV export
-- Pickup tracking: mark pickups, flag no-shows, confirm no-shows
-- Add/remove guest orders per day
-- Announcements: post notices visible on the home page
-- Audit log: all significant actions recorded with actor, timestamp, and context
+- View the weekly lunch menu from Monday to Friday
+- Place and cancel lunch orders with server-side cutoff enforcement
+- Self-record pickup through a QR code flow at the counter
+- View personal order history
+- Submit exception requests for post-cutoff cases
 
----
+### For admins
 
-## Order Cutoff Rules
+- Publish weekly menus manually or through PPTX import
+- Manage users, roles, and order access
+- Review daily orders and export reports
+- Track pickups and no-shows
+- Add guest orders
+- Publish announcements
+- Review an audit trail of significant actions
+
+## Order cutoff rules
 
 | Lunch day | Order cutoff |
 |---|---|
 | Monday | Same Monday **09:15** London time |
-| Tuesday – Friday | Previous day **16:00** London time |
+| Tuesday-Friday | Previous day **16:00** London time |
 
-Cutoff is DST-aware and calculated server-side using `Intl.DateTimeFormat` for Europe/London. Client-side state is display-only — the server always re-validates.
+Cutoffs are calculated server-side in `Europe/London` time and remain DST-aware. Client-side state is display-only; the server always re-validates the rule.
 
----
+## Access control
 
-## Access Control
+- Sign-up is restricted to `@hanwha.com` addresses
+- New accounts start with `is_allowed = false`
+- Admins can pre-register users and grant ordering access
 
-- Sign-up is restricted to `@hanwha.com` email addresses (enforced at both Supabase Auth and DB trigger level)
-- New accounts start with `is_allowed = false` — an admin must grant ordering access
-- Admins can pre-register accounts directly without waiting for self-signup
-
----
-
-## Tech Stack
+## Tech stack
 
 | Layer | Technology |
 |---|---|
-| Framework | Next.js 16 (App Router, TypeScript) |
-| Database & Auth | Supabase (PostgreSQL + Row Level Security) |
-| UI | shadcn/ui v4 (`@base-ui/react`) + Tailwind CSS v4 |
-| Deployment | Vercel |
-| Timezone | `Intl.DateTimeFormat` — Europe/London, DST-correct |
+| Framework | Next.js 16, App Router, TypeScript |
+| Database and auth | Supabase, PostgreSQL, Row Level Security |
+| UI | shadcn/ui v4 and Tailwind CSS v4 |
+| Deployment target | Vercel |
+| Timezone handling | `Intl.DateTimeFormat` with `Europe/London` |
 
----
-
-## Getting Started
-
-### 1. Install dependencies
+## Getting started
 
 ```bash
 npm install
+npm run dev
 ```
 
-### 2. Set up environment variables
-
-Create `.env.local` in the project root:
+Create `.env.local` before running the app:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxxx.supabase.co
@@ -75,53 +70,23 @@ NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=your-publishable-key
 SUPABASE_SERVICE_ROLE_KEY=your-secret-key
 ```
 
-### 3. Run database migrations
+Run the Supabase migrations in order before first use.
 
-In Supabase Dashboard → SQL Editor, run the following files **in order**:
-
-```
-supabase/migrations/001_initial_schema.sql
-supabase/migrations/002_rls_policies.sql
-supabase/migrations/003_indexes.sql
-supabase/migrations/004_triggers_functions.sql
-supabase/migrations/005_guest_orders.sql
-```
-
-### 4. Start the development server
-
-```bash
-npm run dev
-```
-
-Open [http://localhost:3000](http://localhost:3000).
-
-### 5. Create your first admin account
-
-Sign up at `/login` with your `@hanwha.com` email, then run in Supabase SQL Editor:
-
-```sql
-UPDATE profiles SET role = 'admin', is_allowed = true WHERE email = 'you@hanwha.com';
-```
-
----
-
-## Key Routes
+## Key routes
 
 | Route | Description |
 |---|---|
-| `/` | Home — this week's menu + order buttons |
-| `/orders` | My Orders — history and cancel |
-| `/checkin` | QR code landing page for self-pickup |
-| `/admin` | Admin dashboard — today's summary |
-| `/admin/menu` | Menu management — create, edit, publish weeks |
-| `/admin/users` | User management — allowlist, roles |
-| `/admin/daily/[date]` | Daily order list with guest management + CSV export |
-| `/admin/pickup/[date]` | Pickup tracking — mark pickups, flag no-shows |
-| `/admin/exceptions` | Exception request queue |
-| `/admin/announcements` | Announcements CRUD |
-
----
+| `/` | Weekly menu and order actions |
+| `/orders` | Personal order history |
+| `/checkin` | QR-based pickup flow |
+| `/admin` | Admin dashboard |
+| `/admin/menu` | Menu management |
+| `/admin/users` | User management |
+| `/admin/daily/[date]` | Daily orders and export |
+| `/admin/pickup/[date]` | Pickup tracking |
+| `/admin/exceptions` | Exception queue |
+| `/admin/announcements` | Announcement management |
 
 ## Documentation
 
-- [IMPLEMENTATION.md](./IMPLEMENTATION.md) — architecture, data model, business logic, and feature details
+- `IMPLEMENTATION.md` - architecture, data model, business logic, and implementation details
